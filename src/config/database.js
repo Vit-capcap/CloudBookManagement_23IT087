@@ -1,19 +1,11 @@
 const mongoose = require("mongoose");
-const dns = require("dns");
 require("dotenv").config();
-
-// ==========================================
-// CẤU HÌNH DNS
-// ==========================================
-// Máy bạn đang gặp vấn đề DNS với mongodb+srv.
-// Dùng Google DNS để Node.js phân giải MongoDB Atlas.
-dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
 // ==========================================
 // HÀM LẤY USERNAME TỪ MONGODB URI
 // ==========================================
 // Chỉ lấy username để kiểm tra.
-// KHÔNG in password ra màn hình.
+// KHÔNG in password ra console.
 function getMongoUsername(uri) {
     if (!uri) {
         return "Không có URI";
@@ -79,46 +71,84 @@ console.log("==========================================\n");
 // ==========================================
 
 if (!process.env.MONGO_READ_URI) {
-    throw new Error("❌ Thiếu MONGO_READ_URI trong file .env");
+    throw new Error(
+        "❌ Thiếu MONGO_READ_URI trong Environment Variables"
+    );
 }
 
 if (!process.env.MONGO_WRITE_URI) {
-    throw new Error("❌ Thiếu MONGO_WRITE_URI trong file .env");
+    throw new Error(
+        "❌ Thiếu MONGO_WRITE_URI trong Environment Variables"
+    );
 }
 
 if (!process.env.MONGO_SESSION_URI) {
-    throw new Error("❌ Thiếu MONGO_SESSION_URI trong file .env");
+    throw new Error(
+        "❌ Thiếu MONGO_SESSION_URI trong Environment Variables"
+    );
 }
 
 // ==========================================
-// KẾT NỐI READ
+// CẤU HÌNH CHUNG CHO MONGODB
 // ==========================================
-// User này chỉ dùng cho:
+//
+// Không sử dụng:
+// dns.setServers()
+// vì Render đã có hệ thống DNS riêng.
+//
+// TLS được bật thông qua mongodb+srv.
+// Không cần tự thêm tls=true vào URI.
+//
+
+const mongoOptions = {
+    serverSelectionTimeoutMS: 15000,
+    connectTimeoutMS: 15000,
+    socketTimeoutMS: 45000,
+
+    // Không tự động tạo index khi ứng dụng khởi động.
+    autoIndex: false,
+
+    // Giữ kết nối ổn định.
+    maxPoolSize: 10,
+    minPoolSize: 1
+};
+
+// ==========================================
+// READ CONNECTION
+// ==========================================
+// User:
+// book_read_23IT087
+//
+// Chỉ dùng để:
 // GET /books
 //
-// Không dùng connection này cho:
+// Không dùng để:
 // INSERT
 // UPDATE
 // DELETE
 // SESSION
+// ==========================================
 
 const readConnection = mongoose.createConnection(
-    process.env.MONGO_READ_URI
+    process.env.MONGO_READ_URI,
+    mongoOptions
 );
 
 readConnection.on("connected", () => {
+    console.log("==========================================");
     console.log("✅ MongoDB READ connected");
     console.log(
         "   User:",
         getMongoUsername(process.env.MONGO_READ_URI)
     );
+    console.log("==========================================");
 });
 
 readConnection.on("error", (err) => {
-    console.error(
-        "❌ MongoDB READ error:",
-        err.message
-    );
+    console.error("==========================================");
+    console.error("❌ MongoDB READ error");
+    console.error("   Message:", err.message);
+    console.error("==========================================");
 });
 
 readConnection.on("disconnected", () => {
@@ -126,32 +156,39 @@ readConnection.on("disconnected", () => {
 });
 
 // ==========================================
-// KẾT NỐI WRITE
+// WRITE CONNECTION
 // ==========================================
-// User này dùng cho:
+// User:
+// book_write_23IT087
+//
+// Chỉ dùng để:
 // INSERT sách mới
 //
-// Không dùng cho:
+// Không dùng để:
 // GET
 // SESSION
+// ==========================================
 
 const writeConnection = mongoose.createConnection(
-    process.env.MONGO_WRITE_URI
+    process.env.MONGO_WRITE_URI,
+    mongoOptions
 );
 
 writeConnection.on("connected", () => {
+    console.log("==========================================");
     console.log("✅ MongoDB WRITE connected");
     console.log(
         "   User:",
         getMongoUsername(process.env.MONGO_WRITE_URI)
     );
+    console.log("==========================================");
 });
 
 writeConnection.on("error", (err) => {
-    console.error(
-        "❌ MongoDB WRITE error:",
-        err.message
-    );
+    console.error("==========================================");
+    console.error("❌ MongoDB WRITE error");
+    console.error("   Message:", err.message);
+    console.error("==========================================");
 });
 
 writeConnection.on("disconnected", () => {
@@ -159,33 +196,44 @@ writeConnection.on("disconnected", () => {
 });
 
 // ==========================================
-// KẾT NỐI SESSION
+// SESSION CONNECTION
 // ==========================================
-// User này CHỈ dùng để lưu Session
-// vào MongoDB Atlas.
+// User:
+// book_session_23IT087
 //
-// Collection:
-// DB_23IT087.sessions
+// Connection này được export để sử dụng
+// khi cần.
 //
-// Không dùng READ/WRITE connection cho Session.
+// LƯU Ý:
+// connect-mongo hiện tại trong app.js
+// đang sử dụng trực tiếp:
+//
+// MONGO_SESSION_URI
+//
+// nên connection này hiện chưa trực tiếp
+// được connect-mongo sử dụng.
+// ==========================================
 
 const sessionConnection = mongoose.createConnection(
-    process.env.MONGO_SESSION_URI
+    process.env.MONGO_SESSION_URI,
+    mongoOptions
 );
 
 sessionConnection.on("connected", () => {
+    console.log("==========================================");
     console.log("✅ MongoDB SESSION connected");
     console.log(
         "   User:",
         getMongoUsername(process.env.MONGO_SESSION_URI)
     );
+    console.log("==========================================");
 });
 
 sessionConnection.on("error", (err) => {
-    console.error(
-        "❌ MongoDB SESSION error:",
-        err.message
-    );
+    console.error("==========================================");
+    console.error("❌ MongoDB SESSION error");
+    console.error("   Message:", err.message);
+    console.error("==========================================");
 });
 
 sessionConnection.on("disconnected", () => {
