@@ -1,0 +1,514 @@
+<!-- ============================= -->
+<!-- PAGE TITLE -->
+<!-- ============================= -->
+
+<div class="page-title">
+
+    <h2>
+        Dashboard
+    </h2>
+
+    <p>
+        Quản lý và theo dõi danh sách sách trong hệ thống.
+    </p>
+
+</div>
+
+
+<!-- ============================= -->
+<!-- ALERT SUCCESS -->
+<!-- ============================= -->
+
+{{#if success}}
+
+    <div class="alert alert-success">
+
+        <span>✅</span>
+
+        <span>
+            {{success}}
+        </span>
+
+    </div>
+
+{{/if}}
+
+
+<!-- ============================= -->
+<!-- ALERT ERROR -->
+<!-- ============================= -->
+
+{{#if error}}
+
+    <div class="alert alert-error">
+
+        <span>❌</span>
+
+        <span>
+            {{error}}
+        </span>
+
+    </div>
+
+{{/if}}
+
+
+<!-- ============================= -->
+<!-- STATISTICS -->
+<!-- ============================= -->
+
+<div class="stats">
+
+    <!-- Tổng sách -->
+
+    <div class="stat-card">
+
+        <div class="stat-top">
+
+            <div>
+
+                <div class="stat-label">
+                    Tổng số sách
+                </div>
+
+                <div class="stat-value">
+                    {{totalBooks}}
+                </div>
+
+            </div>
+
+            <div class="stat-icon">
+                📚
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Giá trị -->
+
+    <div class="stat-card">
+
+        <div class="stat-top">
+
+            <div>
+
+                <div class="stat-label">
+                    Tổng giá trị sau thuế
+                </div>
+
+                <div class="stat-value">
+
+                    {{totalValueFormatted}}
+                    ₫
+
+                </div>
+
+            </div>
+
+            <div class="stat-icon">
+                💰
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- VAT -->
+
+    <div class="stat-card">
+
+        <div class="stat-top">
+
+            <div>
+
+                <div class="stat-label">
+                    Thuế VAT
+                </div>
+
+                <div class="stat-value">
+                    {{vat}}%
+                </div>
+
+            </div>
+
+            <div class="stat-icon">
+                🧾
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Database -->
+
+    <div class="stat-card">
+
+        <div class="stat-top">
+
+            <div>
+
+                <div class="stat-label">
+                    Database
+                </div>
+
+                <div
+                    class="stat-value"
+                    style="font-size: 18px;"
+                >
+                    MongoDB
+                </div>
+
+            </div>
+
+            <div class="stat-icon">
+                ☁️
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ============================= -->
+<!-- CONTENT -->
+<!-- ============================= -->
+
+<div class="content-grid">
+
+
+    <!-- ========================= -->
+    <!-- FORM -->
+    <!-- ========================= -->
+
+    <div class="card">
+
+        <div class="card-title">
+            Thêm sách mới
+        </div>
+
+        <div class="card-description">
+
+            Nhập thông tin để thêm sách
+            vào hệ thống.
+
+        </div>
+
+
+        <form
+            action="/books"
+            method="POST"
+        >
+
+            <!-- Mã -->
+
+            <div class="form-group">
+
+                <label>
+                    Mã sản phẩm
+                </label>
+
+                <input
+                    type="text"
+                    name="productCode"
+                    placeholder="Ví dụ: 087001"
+                    required
+                >
+
+                <div class="form-hint">
+
+                    Mã sản phẩm phải bắt đầu
+                    bằng 087.
+
+                </div>
+
+            </div>
+
+
+            <!-- Tên -->
+
+            <div class="form-group">
+
+                <label>
+                    Tên sách
+                </label>
+
+                <input
+                    type="text"
+                    name="name"
+                    placeholder="Nhập tên sách"
+                    required
+                >
+
+            </div>
+
+
+            <!-- Tác giả -->
+
+            <div class="form-group">
+
+                <label>
+                    Tác giả
+                </label>
+
+                <input
+                    type="text"
+                    name="author"
+                    placeholder="Nhập tên tác giả"
+                    required
+                >
+
+            </div>
+
+
+            <!-- Giá -->
+
+            <div class="form-group">
+
+                <label>
+                    Giá sách
+                </label>
+
+                <input
+                    type="number"
+                    name="price"
+                    placeholder="Ví dụ: 150000"
+                    min="1"
+                    step="1"
+                    required
+                >
+
+            </div>
+
+
+            <!-- VAT -->
+
+            <div
+                style="
+                    padding: 12px;
+                    background: #f8fafc;
+                    border-radius: 10px;
+                    margin-bottom: 16px;
+                    font-size: 13px;
+                    color: #64748b;
+                "
+            >
+
+                🧾 VAT áp dụng:
+
+                <strong style="color: #4f46e5;">
+                    {{vat}}%
+                </strong>
+
+                <br>
+
+                <span style="font-size: 11px;">
+
+                    Giá sau thuế sẽ được hệ thống
+                    tự động tính trước khi lưu.
+
+                </span>
+
+            </div>
+
+
+            <!-- Button -->
+
+            <button
+                type="submit"
+                class="btn-primary"
+            >
+
+                ➕ Thêm sách
+
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- BOOK LIST -->
+    <!-- ========================= -->
+
+    <div class="card">
+
+        <div class="table-header">
+
+            <div>
+
+                <div class="card-title">
+                    Danh sách sách
+                </div>
+
+                <div
+                    class="card-description"
+                    style="margin-bottom: 0;"
+                >
+
+                    Các sách đã được lưu
+                    trên hệ thống.
+
+                </div>
+
+            </div>
+
+            <div class="book-count">
+
+                {{totalBooks}} sách
+
+            </div>
+
+        </div>
+
+
+        {{#if books}}
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Mã
+                            </th>
+
+                            <th>
+                                Tên sách
+                            </th>
+
+                            <th>
+                                Tác giả
+                            </th>
+
+                            <th>
+                                Giá
+                            </th>
+
+                            <th>
+                                VAT
+                            </th>
+
+                            <th>
+                                Sau thuế
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {{#each books}}
+
+                            <tr>
+
+                                <td>
+
+                                    <span
+                                        class="product-code"
+                                    >
+                                        {{this.productCode}}
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+                                    <div class="book-name">
+                                        {{this.name}}
+                                    </div>
+
+                                </td>
+
+
+                                <td>
+
+                                    <div class="author">
+                                        {{this.author}}
+                                    </div>
+
+                                </td>
+
+
+                                <td>
+
+                                    <span class="price">
+
+                                        {{this.priceFormatted}}
+                                        ₫
+
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+                                    <span class="vat-badge">
+
+                                        {{this.vat}}%
+
+                                    </span>
+
+                                </td>
+
+
+                                <td>
+
+                                    <span
+                                        class="price-after-tax"
+                                    >
+
+                                        {{this.priceAfterTaxFormatted}}
+                                        ₫
+
+                                    </span>
+
+                                </td>
+
+                            </tr>
+
+                        {{/each}}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {{else}}
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    📚
+                </div>
+
+                <h3>
+                    Chưa có sách
+                </h3>
+
+                <p>
+                    Hãy sử dụng biểu mẫu bên trái
+                    để thêm cuốn sách đầu tiên.
+                </p>
+
+            </div>
+
+        {{/if}}
+
+    </div>
+
+</div>
