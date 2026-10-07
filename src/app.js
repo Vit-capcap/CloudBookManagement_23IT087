@@ -52,24 +52,18 @@ app.use(
 app.use(
     session({
         secret: process.env.SESSION_SECRET,
-
         resave: false,
-
         saveUninitialized: false,
 
         store: MongoStore.create({
             mongoUrl: process.env.MONGO_SESSION_URI,
-
             collectionName: "sessions",
-
             autoRemove: "disabled"
         }),
 
         cookie: {
             maxAge: 1000 * 60 * 60,
-
             httpOnly: true,
-
             secure: false
         }
     })
@@ -112,10 +106,6 @@ app.get("/session-test", (req, res) => {
 // SERVER
 // ==========================================
 
-app.listen(PORT, () => {
-
-    console.log(
-        `Server running at http://localhost:${PORT}`
-    );
-
+app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server running on port ${PORT}`);
 });
